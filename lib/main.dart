@@ -1,11 +1,18 @@
+// ignore_for_file: public_member_api_docs
+import 'dart:async';
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 
-import 'home_page.dart';
-
+import 'device_info_page.dart';
 
 
 void main() {
-  runApp(const DeviceInfoApp());
+  runZonedGuarded(() {
+    runApp(const DeviceInfoApp());
+  }, (dynamic error, dynamic stack) {
+    developer.log("Something went wrong!", error: error, stackTrace: stack);
+  });
 }
 
 
@@ -19,7 +26,10 @@ class DeviceInfoApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(title: 'Flutter Device Info'),
+      home: const DeviceInfoPage(),
     );
   }
 }
+
+
+
