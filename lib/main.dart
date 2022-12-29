@@ -3,8 +3,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
-
-import 'device_info_page.dart';
+import 'layout/device_info_page.dart';
 
 
 void main() {
@@ -14,7 +13,6 @@ void main() {
     developer.log("Something went wrong!", error: error, stackTrace: stack);
   });
 }
-
 
 class DeviceInfoApp extends StatelessWidget {
   const DeviceInfoApp({super.key});
@@ -30,6 +28,3 @@ class DeviceInfoApp extends StatelessWidget {
     );
   }
 }
-
-
-

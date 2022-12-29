@@ -1,64 +1,61 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';   // kIsWeb
+import 'package:flutter/services.dart';     // on PlatformException
 
 
-class DeviceInfoPage extends StatefulWidget {
-  const DeviceInfoPage({Key? key}) : super(key: key);
+void main(List<String> args) {
+  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 
-  @override
-  State<DeviceInfoPage> createState() => _DeviceInfoPageState();
+
+  var res = deviceInfoPlugin.windowsInfo.then((value) {
+    print(value.data);
+  });
+
+  print(res);
+
+  // print('Platform()');
+  // print(Platform.);
 }
 
-class _DeviceInfoPageState extends State<DeviceInfoPage> {
-  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  Map<String, dynamic> _deviceData = <String, dynamic>{};
-  String _appBarTxt = '';
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
+class DeviceInfo {
+  static final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+  Map<String, dynamic> data = <String, dynamic>{};
+  String _title = '';
+
+
+  String get title => _title;
+
 
   Future<void> initPlatformState() async {
-    var deviceData = <String, dynamic>{};
-
     try {
       if (kIsWeb) {
-        deviceData = _readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
-        _appBarTxt = 'Web Browser info';
+        data = _readWebBrowserInfo(await _deviceInfoPlugin.webBrowserInfo);
+        _title = 'Web Browser info';
       } else {
         if (Platform.isAndroid) {
-          deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-          _appBarTxt = 'Android Device Info';
+          data = _readAndroidBuildData(await _deviceInfoPlugin.androidInfo);
+          _title = 'Android Device Info';
         } else if (Platform.isIOS) {
-          deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-          _appBarTxt = 'iOS Device Info';
+          data = _readIosDeviceInfo(await _deviceInfoPlugin.iosInfo);
+          _title = 'iOS Device Info';
         } else if (Platform.isLinux) {
-          deviceData = _readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
-          _appBarTxt = 'Linux Device Info';
+          data = _readLinuxDeviceInfo(await _deviceInfoPlugin.linuxInfo);
+          _title = 'Linux Device Info';
         } else if (Platform.isMacOS) {
-          deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
-          _appBarTxt = 'MacOS Device Info';
+          data = _readMacOsDeviceInfo(await _deviceInfoPlugin.macOsInfo);
+          _title = 'MacOS Device Info';
         } else if (Platform.isWindows) {
-          deviceData = _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
-          _appBarTxt = 'Windows Device Info';
+          data = _readWindowsDeviceInfo(await _deviceInfoPlugin.windowsInfo);
+          _title = 'Windows Device Info';
         }
       }
     } on PlatformException {
-      deviceData = <String, dynamic>{
+      data = <String, dynamic>{
         'Error:': 'Failed to get platform version.'
       };
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      _deviceData = deviceData;
-    });
   }
 
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
@@ -170,8 +167,8 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
 
   Map<String, dynamic> _readWindowsDeviceInfo(WindowsDeviceInfo data) {
     return <String, dynamic>{
-      'numberOfCores': data.numberOfCores,
-      'computerName': data.computerName,
+      'Number Of Cores': data.numberOfCores,
+      'Computer Name': data.computerName,
       'systemMemoryInMegabytes': data.systemMemoryInMegabytes,
       'userName': data.userName,
       'majorVersion': data.majorVersion,
@@ -196,42 +193,5 @@ class _DeviceInfoPageState extends State<DeviceInfoPage> {
       'releaseId': data.releaseId,
       'deviceId': data.deviceId,
     };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return (Scaffold(
-      appBar: AppBar(
-        title: Text(_appBarTxt),
-      ),
-      body: ListView(
-        children: _deviceData.keys.map(
-          (String property) {
-            return Row(
-              children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    property,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Expanded(
-                    child: Container(
-                  padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
-                  child: Text(
-                    '${_deviceData[property]}',
-                    maxLines: 10,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )),
-              ],
-            );
-          },
-        ).toList(),
-      ),
-    ));
   }
 }
